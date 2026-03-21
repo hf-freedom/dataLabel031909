@@ -1,0 +1,6 @@
+export { default as OrgTreeSelect } from './OrgTreeSelect.vue'
+export { default as RoleTransfer } from './RoleTransfer.vue'
+export { default as ApiTransfer } from './ApiTransfer.vue'
+export { default as MenuTree } from './MenuTree.vue'
+export { default as IconPicker } from './IconPicker.vue'
+export { default as StatusSwitch } from './StatusSwitch.vue'
