@@ -1,0 +1,8 @@
+# 依赖目录
+node_modules/
+
+# 环境变量文件（可选，根据你的项目情况）
+.env
+.env.local
+.env.*.local
+node_modules
