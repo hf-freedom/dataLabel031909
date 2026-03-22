@@ -55,8 +55,8 @@
         <el-table-column prop="sort" label="排序" width="80" align="center" />
         <el-table-column prop="hidden" label="是否隐藏" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.hidden === 1 ? 'danger' : 'success'" size="small">
-              {{ row.hidden === 1 ? '隐藏' : '显示' }}
+            <el-tag :type="row.hidden === MenuHidden.Hidden ? 'danger' : 'success'" size="small">
+              {{ row.hidden === MenuHidden.Hidden ? '隐藏' : '显示' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -102,21 +102,21 @@
         </el-form-item>
         <el-form-item label="菜单类型" prop="type">
           <el-radio-group v-model="form.type">
-            <el-radio :label="1">目录</el-radio>
-            <el-radio :label="2">菜单</el-radio>
-            <el-radio :label="3">按钮</el-radio>
+            <el-radio :label="MenuType.Directory">目录</el-radio>
+            <el-radio :label="MenuType.Menu">菜单</el-radio>
+            <el-radio :label="MenuType.Button">按钮</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="菜单名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入菜单名称" />
         </el-form-item>
-        <el-form-item v-if="form.type !== 3" label="菜单图标" prop="icon">
+        <el-form-item v-if="form.type !== MenuType.Button" label="菜单图标" prop="icon">
           <icon-picker v-model="form.icon" />
         </el-form-item>
-        <el-form-item v-if="form.type !== 3" label="路由路径" prop="path">
+        <el-form-item v-if="form.type !== MenuType.Button" label="路由路径" prop="path">
           <el-input v-model="form.path" placeholder="请输入路由路径" />
         </el-form-item>
-        <el-form-item v-if="form.type === 2" label="组件路径" prop="component">
+        <el-form-item v-if="form.type === MenuType.Menu" label="组件路径" prop="component">
           <el-input v-model="form.component" placeholder="请输入组件路径" />
         </el-form-item>
         <el-form-item label="权限标识" prop="permission">
@@ -125,10 +125,10 @@
         <el-form-item label="排序码" prop="sort">
           <el-input-number v-model="form.sort" :min="0" :max="9999" />
         </el-form-item>
-        <el-form-item v-if="form.type !== 3" label="是否隐藏" prop="hidden">
+        <el-form-item v-if="form.type !== MenuType.Button" label="是否隐藏" prop="hidden">
           <el-radio-group v-model="form.hidden">
-            <el-radio :label="0">显示</el-radio>
-            <el-radio :label="1">隐藏</el-radio>
+            <el-radio :label="MenuHidden.Visible">显示</el-radio>
+            <el-radio :label="MenuHidden.Hidden">隐藏</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="状态" prop="status">
@@ -148,8 +148,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { menuApi, type MenuForm } from '@/api/menu'
-import type { Menu, App } from '@/types'
+import { menuApi } from '@/api/menu'
+import type { Menu, MenuForm, App } from '@/types'
+import { MenuType, MenuHidden, MenuStatus } from '@/types'
 import { appApi } from '@/api'
 import { StatusSwitch, IconPicker } from '@/components'
 
@@ -168,23 +169,23 @@ const currentMenuId = ref<number | null>(null)
 
 const form = reactive<MenuForm>({
   name: '',
-  type: 1,
+  type: MenuType.Directory,
   parentId: null,
   path: '',
   component: '',
   permission: '',
   icon: '',
   sort: 0,
-  hidden: 0,
-  status: 1,
+  hidden: MenuHidden.Visible,
+  status: MenuStatus.Enabled,
   appId: 0,
 })
 
 const rules = computed<FormRules>(() => ({
   name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
   type: [{ required: true, message: '请选择菜单类型', trigger: 'change' }],
-  path: form.type !== 3 ? [{ required: true, message: '请输入路由路径', trigger: 'blur' }] : [],
-  component: form.type === 2 ? [{ required: true, message: '请输入组件路径', trigger: 'blur' }] : [],
+  path: form.type !== MenuType.Button ? [{ required: true, message: '请输入路由路径', trigger: 'blur' }] : [],
+  component: form.type === MenuType.Menu ? [{ required: true, message: '请输入组件路径', trigger: 'blur' }] : [],
 }))
 
 const fetchApps = async () => {
@@ -206,7 +207,7 @@ const fetchTree = async () => {
   try {
     const res = await menuApi.getTree(currentAppId.value)
     tableData.value = res.data
-    menuTreeData.value = [{ id: 0, name: '根目录', children: res.data } as any]
+    menuTreeData.value = [{ id: 0, name: '根目录', children: res.data } as unknown as Menu]
   } catch (error) {
     console.error('获取菜单树失败', error)
   } finally {
@@ -214,35 +215,35 @@ const fetchTree = async () => {
   }
 }
 
-const getTypeName = (type: number) => {
-  const types: Record<number, string> = {
-    1: '目录',
-    2: '菜单',
-    3: '按钮',
+const getTypeName = (type: MenuType): string => {
+  const types: Record<MenuType, string> = {
+    [MenuType.Directory]: '目录',
+    [MenuType.Menu]: '菜单',
+    [MenuType.Button]: '按钮',
   }
   return types[type] || '未知'
 }
 
-const getTypeTag = (type: number) => {
-  const types: Record<number, string> = {
-    1: 'primary',
-    2: 'success',
-    3: 'warning',
+const getTypeTag = (type: MenuType): string => {
+  const types: Record<MenuType, string> = {
+    [MenuType.Directory]: 'primary',
+    [MenuType.Menu]: 'success',
+    [MenuType.Button]: 'warning',
   }
   return types[type] || 'info'
 }
 
 const resetForm = () => {
   form.name = ''
-  form.type = 1
+  form.type = MenuType.Directory
   form.parentId = null
   form.path = ''
   form.component = ''
   form.permission = ''
   form.icon = ''
   form.sort = 0
-  form.hidden = 0
-  form.status = 1
+  form.hidden = MenuHidden.Visible
+  form.status = MenuStatus.Enabled
   form.appId = currentAppId.value || 0
 }
 
@@ -252,7 +253,7 @@ const handleAdd = (parent: Menu | null) => {
   dialogTitle.value = '新增菜单'
   if (parent) {
     form.parentId = parent.id
-    form.type = parent.type === 1 ? 2 : 3
+    form.type = parent.type === MenuType.Directory ? MenuType.Menu : MenuType.Button
   }
   dialogVisible.value = true
 }
@@ -263,15 +264,15 @@ const handleEdit = (row: Menu) => {
   dialogTitle.value = '编辑菜单'
   currentMenuId.value = row.id
   form.name = row.name
-  form.type = row.type
+  form.type = row.type as MenuType
   form.parentId = row.parentId
   form.path = row.path
   form.component = row.component
   form.permission = row.permission
   form.icon = row.icon
   form.sort = row.sort
-  form.hidden = row.hidden
-  form.status = row.status
+  form.hidden = row.hidden as MenuHidden
+  form.status = row.status as MenuStatus
   form.appId = row.appId
   dialogVisible.value = true
 }

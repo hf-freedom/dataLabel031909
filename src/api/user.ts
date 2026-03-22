@@ -1,61 +1,103 @@
 import { request } from '@/utils/request'
-import type { User, PageResult, PageInfo } from '@/types'
+import type {
+  User,
+  PageResult,
+  UserQuery,
+  UserForm,
+  LoginRequest,
+  LoginResponse,
+  BindRolesRequest,
+  BindOrgsRequest,
+  ResetPasswordResponse,
+  UpdateStatusRequest,
+  ApiResponse,
+} from '@/types'
 
-export interface UserQuery extends PageInfo {
-  username?: string
-  name?: string
-  phone?: string
-  status?: number
-  orgId?: number
-}
-
-export interface UserForm {
-  id?: number
-  username: string
-  name: string
-  phone: string
-  email: string
-  status: number
-  orgIds: number[]
-  primaryOrgId: number | null
-  roleIds: number[]
-  password?: string
-}
-
+/**
+ * 用户管理 API
+ */
 export const userApi = {
-  getList(params: UserQuery) {
+  /**
+   * 用户登录
+   */
+  login(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
+    return request.post<LoginResponse>('/auth/login', data)
+  },
+
+  /**
+   * 获取当前登录用户信息
+   */
+  getCurrentUser(): Promise<ApiResponse<User>> {
+    return request.get<User>('/auth/current')
+  },
+
+  /**
+   * 获取用户列表（分页）
+   */
+  getList(params: UserQuery): Promise<ApiResponse<PageResult<User>>> {
     return request.get<PageResult<User>>('/user/list', { params })
   },
 
-  getDetail(id: number) {
+  /**
+   * 获取用户详情
+   */
+  getDetail(id: number): Promise<ApiResponse<User>> {
     return request.get<User>(`/user/${id}`)
   },
 
-  create(data: UserForm) {
+  /**
+   * 创建用户
+   */
+  create(data: UserForm): Promise<ApiResponse<User>> {
     return request.post<User>('/user', data)
   },
 
-  update(data: UserForm) {
+  /**
+   * 更新用户
+   */
+  update(data: UserForm): Promise<ApiResponse<User>> {
     return request.put<User>('/user', data)
   },
 
-  delete(id: number) {
-    return request.delete(`/user/${id}`)
+  /**
+   * 删除用户
+   */
+  delete(id: number): Promise<ApiResponse<void>> {
+    return request.delete<void>(`/user/${id}`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/user/${id}/status`, { status })
+  /**
+   * 更新用户状态
+   */
+  updateStatus(id: number, status: number): Promise<ApiResponse<void>> {
+    const data: UpdateStatusRequest = { status }
+    return request.put<void>(`/user/${id}/status`, data)
   },
 
-  resetPassword(id: number) {
-    return request.put(`/user/${id}/reset-password`)
+  /**
+   * 重置用户密码
+   */
+  resetPassword(id: number): Promise<ApiResponse<ResetPasswordResponse>> {
+    return request.put<ResetPasswordResponse>(`/user/${id}/reset-password`)
   },
 
-  bindRoles(id: number, roleIds: number[]) {
-    return request.put(`/user/${id}/roles`, { roleIds })
+  /**
+   * 绑定角色
+   */
+  bindRoles(id: number, roleIds: number[]): Promise<ApiResponse<void>> {
+    const data: BindRolesRequest = { roleIds }
+    return request.put<void>(`/user/${id}/roles`, data)
   },
 
-  bindOrgs(id: number, orgIds: number[], primaryOrgId: number | null) {
-    return request.put(`/user/${id}/organizations`, { orgIds, primaryOrgId })
+  /**
+   * 绑定组织机构
+   */
+  bindOrgs(
+    id: number,
+    orgIds: number[],
+    primaryOrgId: number | null
+  ): Promise<ApiResponse<void>> {
+    const data: BindOrgsRequest = { orgIds, primaryOrgId }
+    return request.put<void>(`/user/${id}/organizations`, data)
   },
 }

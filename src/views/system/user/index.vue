@@ -13,8 +13,8 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
-            <el-option label="启用" :value="1" />
-            <el-option label="停用" :value="0" />
+            <el-option label="启用" :value="UserStatus.Enabled" />
+            <el-option label="停用" :value="UserStatus.Disabled" />
           </el-select>
         </el-form-item>
         <el-form-item label="组织机构">
@@ -199,8 +199,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { userApi, type UserQuery, type UserForm } from '@/api/user'
-import type { User } from '@/types'
+import { userApi } from '@/api/user'
+import type { User, UserQuery, UserForm } from '@/types'
+import { UserStatus } from '@/types'
 import { OrgTreeSelect, RoleTransfer, StatusSwitch } from '@/components'
 
 const loading = ref(false)
@@ -229,7 +230,7 @@ const form = reactive<UserForm>({
   name: '',
   phone: '',
   email: '',
-  status: 1,
+  status: UserStatus.Enabled,
   orgIds: [],
   primaryOrgId: null,
   roleIds: [],
@@ -300,7 +301,7 @@ const resetForm = () => {
   form.name = ''
   form.phone = ''
   form.email = ''
-  form.status = 1
+  form.status = UserStatus.Enabled
   form.orgIds = []
   form.primaryOrgId = null
   form.roleIds = []

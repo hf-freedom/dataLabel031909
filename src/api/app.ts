@@ -1,52 +1,73 @@
 import { request } from '@/utils/request'
-import type { App, PageResult, PageInfo } from '@/types'
+import type {
+  App,
+  PageResult,
+  AppQuery,
+  AppForm,
+  BindAppOrgsRequest,
+  UpdateStatusRequest,
+  ApiResponse,
+} from '@/types'
 
-export interface AppQuery extends PageInfo {
-  name?: string
-  code?: string
-  status?: number
-}
-
-export interface AppForm {
-  id?: number
-  name: string
-  code: string
-  dbConfig: string
-  status: number
-  remark: string
-  organizations: number[]
-}
-
+/**
+ * 应用管理 API
+ */
 export const appApi = {
-  getList(params: AppQuery) {
+  /**
+   * 获取应用列表（分页）
+   */
+  getList(params: AppQuery): Promise<ApiResponse<PageResult<App>>> {
     return request.get<PageResult<App>>('/app/list', { params })
   },
 
-  getAll() {
+  /**
+   * 获取所有应用
+   */
+  getAll(): Promise<ApiResponse<App[]>> {
     return request.get<App[]>('/app/all')
   },
 
-  getDetail(id: number) {
+  /**
+   * 获取应用详情
+   */
+  getDetail(id: number): Promise<ApiResponse<App>> {
     return request.get<App>(`/app/${id}`)
   },
 
-  create(data: AppForm) {
+  /**
+   * 创建应用
+   */
+  create(data: AppForm): Promise<ApiResponse<App>> {
     return request.post<App>('/app', data)
   },
 
-  update(data: AppForm) {
+  /**
+   * 更新应用
+   */
+  update(data: AppForm): Promise<ApiResponse<App>> {
     return request.put<App>('/app', data)
   },
 
-  delete(id: number) {
-    return request.delete(`/app/${id}`)
+  /**
+   * 删除应用
+   */
+  delete(id: number): Promise<ApiResponse<void>> {
+    return request.delete<void>(`/app/${id}`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/app/${id}/status`, { status })
+  /**
+   * 更新应用状态
+   */
+  updateStatus(id: number, status: number): Promise<ApiResponse<void>> {
+    const data: UpdateStatusRequest = { status }
+    return request.put<void>(`/app/${id}/status`, data)
   },
 
-  bindOrganizations(id: number, orgIds: number[]) {
-    return request.put(`/app/${id}/organizations`, { orgIds })
+  /**
+   * 绑定组织机构
+   */
+  bindOrganizations(id: number, orgIds: number[]): Promise<ApiResponse<void>> {
+    const data: BindAppOrgsRequest = { orgIds }
+    return request.put<void>(`/app/${id}/organizations`, data)
   },
 }
