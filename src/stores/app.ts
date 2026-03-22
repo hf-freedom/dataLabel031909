@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import type { App } from '@/types'
-import { appApi } from '@/api'
 
 interface AppState {
   apps: App[]
   currentApp: App | null
   loading: boolean
+  sidebarCollapsed: boolean
 }
 
 export const useAppStore = defineStore('app', {
@@ -13,23 +13,36 @@ export const useAppStore = defineStore('app', {
     apps: [],
     currentApp: null,
     loading: false,
+    sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
   }),
 
+  getters: {
+    currentAppId: (state): number | null => state.currentApp?.id ?? null,
+    hasApps: (state): boolean => state.apps.length > 0,
+  },
+
   actions: {
-    async fetchAll() {
-      this.loading = true
-      try {
-        const res = await appApi.getAll()
-        this.apps = res.data
-        return res.data
-      } finally {
-        this.loading = false
-      }
+    setApps(apps: App[]): void {
+      this.apps = apps
     },
 
-    setCurrentApp(app: App) {
+    setCurrentApp(app: App): void {
       this.currentApp = app
       localStorage.setItem('currentAppId', String(app.id))
+    },
+
+    setLoading(loading: boolean): void {
+      this.loading = loading
+    },
+
+    toggleSidebar(): void {
+      this.sidebarCollapsed = !this.sidebarCollapsed
+      localStorage.setItem('sidebarCollapsed', String(this.sidebarCollapsed))
+    },
+
+    setSidebarCollapsed(collapsed: boolean): void {
+      this.sidebarCollapsed = collapsed
+      localStorage.setItem('sidebarCollapsed', String(collapsed))
     },
 
     getCurrentApp(): App | null {
@@ -39,6 +52,12 @@ export const useAppStore = defineStore('app', {
         this.currentApp = this.apps.find(a => a.id === Number(appId)) || this.apps[0]
       }
       return this.currentApp
+    },
+
+    clearApp(): void {
+      this.apps = []
+      this.currentApp = null
+      this.loading = false
     },
   },
 })

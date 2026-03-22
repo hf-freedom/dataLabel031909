@@ -1,10 +1,11 @@
 import { request } from '@/utils/request'
-import type { App, PageResult, PageInfo } from '@/types'
+import type { App, PageResult, PageInfo, ApiResponse } from '@/types'
+import { AppStatus } from '@/types'
 
 export interface AppQuery extends PageInfo {
   name?: string
   code?: string
-  status?: number
+  status?: AppStatus
 }
 
 export interface AppForm {
@@ -12,41 +13,59 @@ export interface AppForm {
   name: string
   code: string
   dbConfig: string
-  status: number
+  status: AppStatus
   remark: string
   organizations: number[]
 }
 
+export interface AppListResponse extends PageResult<App> {}
+
+export interface AppAllResponse extends Array<App> {}
+
+export interface AppDetailResponse extends App {}
+
+export interface AppCreateResponse extends App {}
+
+export interface AppUpdateResponse extends App {}
+
+export interface AppUpdateStatusRequest {
+  status: AppStatus
+}
+
+export interface AppBindOrganizationsRequest {
+  orgIds: number[]
+}
+
 export const appApi = {
-  getList(params: AppQuery) {
-    return request.get<PageResult<App>>('/app/list', { params })
+  getList(params: AppQuery): Promise<ApiResponse<AppListResponse>> {
+    return request.get<AppListResponse>('/app/list', { params })
   },
 
-  getAll() {
-    return request.get<App[]>('/app/all')
+  getAll(): Promise<ApiResponse<AppAllResponse>> {
+    return request.get<AppAllResponse>('/app/all')
   },
 
-  getDetail(id: number) {
-    return request.get<App>(`/app/${id}`)
+  getDetail(id: number): Promise<ApiResponse<AppDetailResponse>> {
+    return request.get<AppDetailResponse>(`/app/${id}`)
   },
 
-  create(data: AppForm) {
-    return request.post<App>('/app', data)
+  create(data: AppForm): Promise<ApiResponse<AppCreateResponse>> {
+    return request.post<AppCreateResponse>('/app', data)
   },
 
-  update(data: AppForm) {
-    return request.put<App>('/app', data)
+  update(data: AppForm): Promise<ApiResponse<AppUpdateResponse>> {
+    return request.put<AppUpdateResponse>('/app', data)
   },
 
-  delete(id: number) {
-    return request.delete(`/app/${id}`)
+  delete(id: number): Promise<ApiResponse<void>> {
+    return request.delete<void>(`/app/${id}`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/app/${id}/status`, { status })
+  updateStatus(id: number, status: AppStatus): Promise<ApiResponse<void>> {
+    return request.put<void>(`/app/${id}/status`, { status } as AppUpdateStatusRequest)
   },
 
-  bindOrganizations(id: number, orgIds: number[]) {
-    return request.put(`/app/${id}/organizations`, { orgIds })
+  bindOrganizations(id: number, orgIds: number[]): Promise<ApiResponse<void>> {
+    return request.put<void>(`/app/${id}/organizations`, { orgIds } as AppBindOrganizationsRequest)
   },
 }

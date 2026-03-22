@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Layout from '@/layouts/Index.vue'
+import { cancelAllPendingRequests } from '@/utils/request'
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
@@ -85,6 +86,10 @@ export const asyncRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes: [...constantRoutes, ...asyncRoutes],
+})
+
+router.beforeEach(() => {
+  cancelAllPendingRequests()
 })
 
 export default router
