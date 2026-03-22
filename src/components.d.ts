@@ -49,6 +49,7 @@ declare module 'vue' {
     ElTransfer: typeof import('element-plus/es')['ElTransfer']
     ElTree: typeof import('element-plus/es')['ElTree']
     ElTreeSelect: typeof import('element-plus/es')['ElTreeSelect']
+    ErrorBoundary: typeof import('./components/ErrorBoundary.vue')['default']
     IconPicker: typeof import('./components/IconPicker.vue')['default']
     MenuTree: typeof import('./components/MenuTree.vue')['default']
     OrgTreeSelect: typeof import('./components/OrgTreeSelect.vue')['default']

@@ -90,7 +90,7 @@
             <el-descriptions-item label="系统名称">{{ title }}</el-descriptions-item>
             <el-descriptions-item label="系统版本">v1.0.0</el-descriptions-item>
             <el-descriptions-item label="技术栈">Vue 3 + TypeScript + Element Plus</el-descriptions-item>
-            <el-descriptions-item label="当前用户">{{ userStore.userInfo?.name }}</el-descriptions-item>
+            <el-descriptions-item label="当前用户">{{ authStore.userInfo?.name }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </el-col>
@@ -100,10 +100,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores'
+import { useAuthStore } from '@/stores'
 
 const title = import.meta.env.VITE_APP_TITLE
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const stats = ref({
   userCount: 128,

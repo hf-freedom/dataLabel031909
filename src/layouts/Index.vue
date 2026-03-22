@@ -42,7 +42,7 @@
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar :size="32" icon="UserFilled" />
-              <span class="username">{{ userStore.userInfo?.name || '管理员' }}</span>
+              <span class="username">{{ authStore.userInfo?.name || '管理员' }}</span>
               <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
@@ -69,16 +69,20 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '@/stores'
+import { useAuthStore, useAppStore } from '@/stores'
 import SidebarItem from './SidebarItem.vue'
 import AppSelector from './AppSelector.vue'
 
 const title = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
+const authStore = useAuthStore()
+const appStore = useAppStore()
 
-const isCollapse = ref(false)
+const isCollapse = computed({
+  get: () => appStore.sidebarCollapsed,
+  set: (val) => appStore.setSidebarCollapsed(val),
+})
 
 const routes = computed(() => {
   return router.options.routes.filter(r => !r.meta?.hidden)
@@ -91,7 +95,7 @@ const breadcrumbs = computed(() => {
 })
 
 const toggleCollapse = () => {
-  isCollapse.value = !isCollapse.value
+  appStore.toggleSidebar()
 }
 
 const handleCommand = (command: string) => {
@@ -103,7 +107,7 @@ const handleCommand = (command: string) => {
       router.push('/password')
       break
     case 'logout':
-      userStore.logout()
+      authStore.logout()
       router.push('/login')
       break
   }

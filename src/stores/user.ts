@@ -1,69 +1,70 @@
 import { defineStore } from 'pinia'
-import type { User, Menu, App } from '@/types'
+import type { User, PageResult, PageInfo } from '@/types'
+import { UserStatus } from '@/types'
+
+export interface UserQuery extends PageInfo {
+  username?: string
+  name?: string
+  phone?: string
+  status?: UserStatus
+  orgId?: number
+}
+
+export interface UserForm {
+  id?: number
+  username: string
+  name: string
+  phone: string
+  email: string
+  status: UserStatus
+  orgIds: number[]
+  primaryOrgId: number | null
+  roleIds: number[]
+  password?: string
+}
 
 interface UserState {
-  token: string
-  userInfo: User | null
-  menus: Menu[]
-  permissions: string[]
-  currentApp: App | null
-  apps: App[]
+  users: User[]
+  currentUser: User | null
+  loading: boolean
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+  }
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    token: localStorage.getItem('token') || '',
-    userInfo: null,
-    menus: [],
-    permissions: [],
-    currentApp: null,
-    apps: [],
+    users: [],
+    currentUser: null,
+    loading: false,
+    pagination: {
+      page: 1,
+      pageSize: 10,
+      total: 0,
+    },
   }),
 
   getters: {
-    isLoggedIn: (state) => !!state.token,
+    hasUsers: (state): boolean => state.users.length > 0,
   },
 
   actions: {
-    setToken(token: string) {
-      this.token = token
-      localStorage.setItem('token', token)
+    setUsers(users: User[]): void {
+      this.users = users
     },
 
-    setUserInfo(userInfo: User) {
-      this.userInfo = userInfo
+    setCurrentUser(user: User | null): void {
+      this.currentUser = user
     },
 
-    setMenus(menus: Menu[]) {
-      this.menus = menus
+    setLoading(loading: boolean): void {
+      this.loading = loading
     },
 
-    setPermissions(permissions: string[]) {
-      this.permissions = permissions
-    },
-
-    setCurrentApp(app: App) {
-      this.currentApp = app
-      localStorage.setItem('currentAppId', String(app.id))
-    },
-
-    setApps(apps: App[]) {
-      this.apps = apps
-    },
-
-    hasPermission(permission: string): boolean {
-      return this.permissions.includes(permission)
-    },
-
-    logout() {
-      this.token = ''
-      this.userInfo = null
-      this.menus = []
-      this.permissions = []
-      this.currentApp = null
-      this.apps = []
-      localStorage.removeItem('token')
-      localStorage.removeItem('currentAppId')
+    setPagination(pagination: Partial<UserState['pagination']>): void {
+      this.pagination = { ...this.pagination, ...pagination }
     },
   },
 })
