@@ -228,10 +228,10 @@ import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'elem
 import { roleApi, type RoleQuery, type RoleForm } from '@/api/role'
 import type { Role, User } from '@/types'
 import { StatusSwitch, MenuTree, ApiTransfer, OrgTreeSelect } from '@/components'
-import { useAppStore } from '@/stores'
+import { useAppStateStore } from '@/stores'
 
-const appStore = useAppStore()
-const currentAppId = appStore.currentApp?.id
+const appStateStore = useAppStateStore()
+const currentAppId = appStateStore.currentApp?.id
 
 const loading = ref(false)
 const submitLoading = ref(false)

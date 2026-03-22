@@ -1,43 +1,50 @@
 import { request } from '@/utils/request'
-import type { Menu } from '@/types'
+import type { Menu, MenuForm, MenuTreeQuery, ApiResponse } from '@/types'
 
-export interface MenuForm {
-  id?: number
-  name: string
-  type: number
-  parentId: number | null
-  path: string
-  component: string
-  permission: string
-  icon: string
-  sort: number
-  hidden: number
-  status: number
-  appId: number
-}
-
+/**
+ * 菜单管理 API
+ */
 export const menuApi = {
-  getTree(appId?: number) {
-    return request.get<Menu[]>('/menu/tree', { params: { appId } })
+  /**
+   * 获取菜单树
+   */
+  getTree(appId?: number): Promise<ApiResponse<Menu[]>> {
+    const params: MenuTreeQuery = appId ? { appId } : {}
+    return request.get<Menu[]>('/menu/tree', { params })
   },
 
-  getDetail(id: number) {
+  /**
+   * 获取菜单详情
+   */
+  getDetail(id: number): Promise<ApiResponse<Menu>> {
     return request.get<Menu>(`/menu/${id}`)
   },
 
-  create(data: MenuForm) {
+  /**
+   * 创建菜单
+   */
+  create(data: MenuForm): Promise<ApiResponse<Menu>> {
     return request.post<Menu>('/menu', data)
   },
 
-  update(data: MenuForm) {
+  /**
+   * 更新菜单
+   */
+  update(data: MenuForm): Promise<ApiResponse<Menu>> {
     return request.put<Menu>('/menu', data)
   },
 
-  delete(id: number) {
-    return request.delete(`/menu/${id}`)
+  /**
+   * 删除菜单
+   */
+  delete(id: number): Promise<ApiResponse<void>> {
+    return request.delete<void>(`/menu/${id}`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/menu/${id}/status`, { status })
+  /**
+   * 更新菜单状态
+   */
+  updateStatus(id: number, status: number): Promise<ApiResponse<void>> {
+    return request.put<void>(`/menu/${id}/status`, { status })
   },
 }

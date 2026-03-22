@@ -1,48 +1,56 @@
 import { request } from '@/utils/request'
-import type { Api, PageResult, PageInfo } from '@/types'
+import type { Api, PageResult, ApiQuery, ApiForm, ApiResponse } from '@/types'
 
-export interface ApiQuery extends PageInfo {
-  name?: string
-  method?: string
-  path?: string
-  appId?: number
-}
-
-export interface ApiForm {
-  id?: number
-  name: string
-  method: string
-  path: string
-  appId: number
-  remark: string
-}
-
+/**
+ * API 权限管理 API
+ */
 export const apiApi = {
-  getList(params: ApiQuery) {
+  /**
+   * 获取 API 列表（分页）
+   */
+  getList(params: ApiQuery): Promise<ApiResponse<PageResult<Api>>> {
     return request.get<PageResult<Api>>('/api/list', { params })
   },
 
-  getAll(appId?: number) {
-    return request.get<Api[]>('/api/all', { params: { appId } })
+  /**
+   * 获取所有 API
+   */
+  getAll(appId?: number): Promise<ApiResponse<Api[]>> {
+    return request.get<Api[]>('/api/all', { params: appId ? { appId } : {} })
   },
 
-  getDetail(id: number) {
+  /**
+   * 获取 API 详情
+   */
+  getDetail(id: number): Promise<ApiResponse<Api>> {
     return request.get<Api>(`/api/${id}`)
   },
 
-  create(data: ApiForm) {
+  /**
+   * 创建 API
+   */
+  create(data: ApiForm): Promise<ApiResponse<Api>> {
     return request.post<Api>('/api', data)
   },
 
-  update(data: ApiForm) {
+  /**
+   * 更新 API
+   */
+  update(data: ApiForm): Promise<ApiResponse<Api>> {
     return request.put<Api>('/api', data)
   },
 
-  delete(id: number) {
-    return request.delete(`/api/${id}`)
+  /**
+   * 删除 API
+   */
+  delete(id: number): Promise<ApiResponse<void>> {
+    return request.delete<void>(`/api/${id}`)
   },
 
-  getRoles(id: number) {
-    return request.get(`/api/${id}/roles`)
+  /**
+   * 获取 API 关联的角色
+   */
+  getRoles(id: number): Promise<ApiResponse<unknown[]>> {
+    return request.get<unknown[]>(`/api/${id}/roles`)
   },
 }

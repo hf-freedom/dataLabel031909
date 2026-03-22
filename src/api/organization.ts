@@ -1,48 +1,71 @@
 import { request } from '@/utils/request'
-import type { Organization } from '@/types'
+import type {
+  Organization,
+  OrganizationForm,
+  MoveNodeRequest,
+  UpdateSortRequest,
+  ApiResponse,
+} from '@/types'
 
-export interface OrganizationForm {
-  id?: number
-  name: string
-  code: string
-  sort: number
-  type: number
-  leader: string
-  phone: string
-  status: number
-  parentId: number | null
-}
-
+/**
+ * 组织机构管理 API
+ */
 export const organizationApi = {
-  getTree() {
+  /**
+   * 获取组织机构树
+   */
+  getTree(): Promise<ApiResponse<Organization[]>> {
     return request.get<Organization[]>('/organization/tree')
   },
 
-  getDetail(id: number) {
+  /**
+   * 获取组织机构详情
+   */
+  getDetail(id: number): Promise<ApiResponse<Organization>> {
     return request.get<Organization>(`/organization/${id}`)
   },
 
-  create(data: OrganizationForm) {
+  /**
+   * 创建组织机构
+   */
+  create(data: OrganizationForm): Promise<ApiResponse<Organization>> {
     return request.post<Organization>('/organization', data)
   },
 
-  update(data: OrganizationForm) {
+  /**
+   * 更新组织机构
+   */
+  update(data: OrganizationForm): Promise<ApiResponse<Organization>> {
     return request.put<Organization>('/organization', data)
   },
 
-  delete(id: number) {
-    return request.delete(`/organization/${id}`)
+  /**
+   * 删除组织机构
+   */
+  delete(id: number): Promise<ApiResponse<void>> {
+    return request.delete<void>(`/organization/${id}`)
   },
 
-  updateSort(id: number, sort: number) {
-    return request.put(`/organization/${id}/sort`, { sort })
+  /**
+   * 更新排序
+   */
+  updateSort(id: number, sort: number): Promise<ApiResponse<void>> {
+    const data: UpdateSortRequest = { sort }
+    return request.put<void>(`/organization/${id}/sort`, data)
   },
 
-  moveNode(id: number, parentId: number | null) {
-    return request.put(`/organization/${id}/move`, { parentId })
+  /**
+   * 移动节点
+   */
+  moveNode(id: number, parentId: number | null): Promise<ApiResponse<void>> {
+    const data: MoveNodeRequest = { parentId }
+    return request.put<void>(`/organization/${id}/move`, data)
   },
 
-  getUsers(id: number) {
-    return request.get(`/organization/${id}/users`)
+  /**
+   * 获取组织机构下的用户
+   */
+  getUsers(id: number): Promise<ApiResponse<unknown[]>> {
+    return request.get<unknown[]>(`/organization/${id}/users`)
   },
 }

@@ -1,4 +1,5 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import { cancelAllPendingRequests } from '@/utils/request'
 import Layout from '@/layouts/Index.vue'
 
 export const constantRoutes: RouteRecordRaw[] = [
@@ -85,6 +86,34 @@ export const asyncRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes: [...constantRoutes, ...asyncRoutes],
+})
+
+/**
+ * 全局前置守卫
+ * 页面切换时取消所有未完成的请求
+ */
+router.beforeEach((
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext
+) => {
+  // 取消所有 pending 的请求
+  if (from.path !== to.path) {
+    cancelAllPendingRequests('页面切换，请求被取消')
+  }
+
+  next()
+})
+
+/**
+ * 全局后置钩子
+ */
+router.afterEach((to: RouteLocationNormalized) => {
+  // 设置页面标题
+  const title = to.meta?.title as string
+  if (title) {
+    document.title = `${title} - ${import.meta.env.VITE_APP_TITLE || '管理系统'}`
+  }
 })
 
 export default router

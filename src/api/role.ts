@@ -1,80 +1,123 @@
 import { request } from '@/utils/request'
-import type { Role, PageResult, PageInfo } from '@/types'
+import type {
+  Role,
+  PageResult,
+  RoleQuery,
+  RoleForm,
+  UpdateRoleMenusRequest,
+  UpdateRoleApisRequest,
+  UpdateDataScopeRequest,
+  UpdateStatusRequest,
+  ApiResponse,
+} from '@/types'
 
-export interface RoleQuery extends PageInfo {
-  name?: string
-  code?: string
-  type?: number
-  status?: number
-}
-
-export interface RoleForm {
-  id?: number
-  name: string
-  code: string
-  type: number
-  status: number
-  remark: string
-  menus: number[]
-  apis: number[]
-  dataScope: number
-  dataOrgs: number[]
-}
-
+/**
+ * 角色管理 API
+ */
 export const roleApi = {
-  getList(params: RoleQuery) {
+  /**
+   * 获取角色列表（分页）
+   */
+  getList(params: RoleQuery): Promise<ApiResponse<PageResult<Role>>> {
     return request.get<PageResult<Role>>('/role/list', { params })
   },
 
-  getAll() {
+  /**
+   * 获取所有角色
+   */
+  getAll(): Promise<ApiResponse<Role[]>> {
     return request.get<Role[]>('/role/all')
   },
 
-  getDetail(id: number) {
+  /**
+   * 获取角色详情
+   */
+  getDetail(id: number): Promise<ApiResponse<Role>> {
     return request.get<Role>(`/role/${id}`)
   },
 
-  create(data: RoleForm) {
+  /**
+   * 创建角色
+   */
+  create(data: RoleForm): Promise<ApiResponse<Role>> {
     return request.post<Role>('/role', data)
   },
 
-  update(data: RoleForm) {
+  /**
+   * 更新角色
+   */
+  update(data: RoleForm): Promise<ApiResponse<Role>> {
     return request.put<Role>('/role', data)
   },
 
-  delete(id: number) {
-    return request.delete(`/role/${id}`)
+  /**
+   * 删除角色
+   */
+  delete(id: number): Promise<ApiResponse<void>> {
+    return request.delete<void>(`/role/${id}`)
   },
 
-  copy(id: number) {
+  /**
+   * 复制角色
+   */
+  copy(id: number): Promise<ApiResponse<Role>> {
     return request.post<Role>(`/role/${id}/copy`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/role/${id}/status`, { status })
+  /**
+   * 更新角色状态
+   */
+  updateStatus(id: number, status: number): Promise<ApiResponse<void>> {
+    const data: UpdateStatusRequest = { status }
+    return request.put<void>(`/role/${id}/status`, data)
   },
 
-  getMenus(id: number) {
+  /**
+   * 获取角色的菜单权限
+   */
+  getMenus(id: number): Promise<ApiResponse<number[]>> {
     return request.get<number[]>(`/role/${id}/menus`)
   },
 
-  getApis(id: number) {
+  /**
+   * 获取角色的 API 权限
+   */
+  getApis(id: number): Promise<ApiResponse<number[]>> {
     return request.get<number[]>(`/role/${id}/apis`)
   },
 
-  updateMenus(id: number, menuIds: number[]) {
-    return request.put(`/role/${id}/menus`, { menuIds })
+  /**
+   * 更新角色的菜单权限
+   */
+  updateMenus(id: number, menuIds: number[]): Promise<ApiResponse<void>> {
+    const data: UpdateRoleMenusRequest = { menuIds }
+    return request.put<void>(`/role/${id}/menus`, data)
   },
 
-  updateApis(id: number, apiIds: number[]) {
-    return request.put(`/role/${id}/apis`, { apiIds })
+  /**
+   * 更新角色的 API 权限
+   */
+  updateApis(id: number, apiIds: number[]): Promise<ApiResponse<void>> {
+    const data: UpdateRoleApisRequest = { apiIds }
+    return request.put<void>(`/role/${id}/apis`, data)
   },
 
-  updateDataScope(id: number, dataScope: number, dataOrgs: number[]) {
-    return request.put(`/role/${id}/data-scope`, { dataScope, dataOrgs })
+  /**
+   * 更新角色的数据权限范围
+   */
+  updateDataScope(
+    id: number,
+    dataScope: number,
+    dataOrgs: number[]
+  ): Promise<ApiResponse<void>> {
+    const data: UpdateDataScopeRequest = { dataScope, dataOrgs }
+    return request.put<void>(`/role/${id}/data-scope`, data)
   },
 
-  getUsers(id: number) {
-    return request.get(`/role/${id}/users`)
+  /**
+   * 获取角色下的用户
+   */
+  getUsers(id: number): Promise<ApiResponse<unknown[]>> {
+    return request.get<unknown[]>(`/role/${id}/users`)
   },
 }
