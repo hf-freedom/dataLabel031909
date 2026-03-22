@@ -1,10 +1,10 @@
 import { request } from '@/utils/request'
-import type { Menu } from '@/types'
+import type { Menu, MenuType, UserStatus, StatusUpdateRequest } from '@/types'
 
 export interface MenuForm {
   id?: number
   name: string
-  type: number
+  type: MenuType
   parentId: number | null
   path: string
   component: string
@@ -12,13 +12,17 @@ export interface MenuForm {
   icon: string
   sort: number
   hidden: number
-  status: number
+  status: UserStatus
   appId: number
+}
+
+export interface MenuTreeQuery {
+  appId?: number
 }
 
 export const menuApi = {
   getTree(appId?: number) {
-    return request.get<Menu[]>('/menu/tree', { params: { appId } })
+    return request.get<Menu[]>('/menu/tree', { params: { appId } as MenuTreeQuery })
   },
 
   getDetail(id: number) {
@@ -34,10 +38,10 @@ export const menuApi = {
   },
 
   delete(id: number) {
-    return request.delete(`/menu/${id}`)
+    return request.delete<void>(`/menu/${id}`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/menu/${id}/status`, { status })
+  updateStatus(id: number, status: UserStatus) {
+    return request.put<void>(`/menu/${id}/status`, { id, status } as StatusUpdateRequest)
   },
 }

@@ -42,11 +42,12 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { useUserStore } from '@/stores'
+import { useAuthStore } from '@/stores'
+import { UserStatus } from '@/types'
 
 const title = import.meta.env.VITE_APP_TITLE
 const router = useRouter()
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const formRef = ref<FormInstance>()
 const loading = ref(false)
@@ -67,21 +68,21 @@ const handleLogin = async () => {
 
   loading.value = true
   try {
-    userStore.setToken('mock-token')
-    userStore.setUserInfo({
+    authStore.setToken('mock-token')
+    authStore.setUserInfo({
       id: 1,
       username: form.username,
       name: '管理员',
       phone: '13800138000',
       email: 'admin@example.com',
-      status: 1,
+      status: UserStatus.ENABLED,
       organizations: [],
       primaryOrgId: null,
       roles: [],
       createdAt: '',
       updatedAt: '',
     })
-    userStore.setPermissions([
+    authStore.setPermissions([
       'system:user:list',
       'system:org:list',
       'system:role:list',
