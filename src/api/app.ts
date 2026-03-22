@@ -1,10 +1,10 @@
 import { request } from '@/utils/request'
-import type { App, PageResult, PageInfo } from '@/types'
+import type { App, PageResult, PageInfo, AppStatus, StatusUpdateRequest } from '@/types'
 
 export interface AppQuery extends PageInfo {
   name?: string
   code?: string
-  status?: number
+  status?: AppStatus
 }
 
 export interface AppForm {
@@ -12,9 +12,14 @@ export interface AppForm {
   name: string
   code: string
   dbConfig: string
-  status: number
+  status: AppStatus
   remark: string
   organizations: number[]
+}
+
+export interface BindOrganizationsRequest {
+  id: number
+  orgIds: number[]
 }
 
 export const appApi = {
@@ -39,14 +44,14 @@ export const appApi = {
   },
 
   delete(id: number) {
-    return request.delete(`/app/${id}`)
+    return request.delete<void>(`/app/${id}`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/app/${id}/status`, { status })
+  updateStatus(id: number, status: AppStatus) {
+    return request.put<void>(`/app/${id}/status`, { id, status } as StatusUpdateRequest)
   },
 
   bindOrganizations(id: number, orgIds: number[]) {
-    return request.put(`/app/${id}/organizations`, { orgIds })
+    return request.put<void>(`/app/${id}/organizations`, { orgIds })
   },
 }

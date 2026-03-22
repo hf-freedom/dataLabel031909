@@ -1,11 +1,11 @@
 import { request } from '@/utils/request'
-import type { User, PageResult, PageInfo } from '@/types'
+import type { User, PageResult, PageInfo, UserStatus, StatusUpdateRequest } from '@/types'
 
 export interface UserQuery extends PageInfo {
   username?: string
   name?: string
   phone?: string
-  status?: number
+  status?: UserStatus
   orgId?: number
 }
 
@@ -15,11 +15,22 @@ export interface UserForm {
   name: string
   phone: string
   email: string
-  status: number
+  status: UserStatus
   orgIds: number[]
   primaryOrgId: number | null
   roleIds: number[]
   password?: string
+}
+
+export interface BindRolesRequest {
+  id: number
+  roleIds: number[]
+}
+
+export interface BindOrgsRequest {
+  id: number
+  orgIds: number[]
+  primaryOrgId: number | null
 }
 
 export const userApi = {
@@ -40,22 +51,22 @@ export const userApi = {
   },
 
   delete(id: number) {
-    return request.delete(`/user/${id}`)
+    return request.delete<void>(`/user/${id}`)
   },
 
-  updateStatus(id: number, status: number) {
-    return request.put(`/user/${id}/status`, { status })
+  updateStatus(id: number, status: UserStatus) {
+    return request.put<void>(`/user/${id}/status`, { status } as StatusUpdateRequest)
   },
 
   resetPassword(id: number) {
-    return request.put(`/user/${id}/reset-password`)
+    return request.put<void>(`/user/${id}/reset-password`)
   },
 
   bindRoles(id: number, roleIds: number[]) {
-    return request.put(`/user/${id}/roles`, { roleIds })
+    return request.put<void>(`/user/${id}/roles`, { roleIds })
   },
 
   bindOrgs(id: number, orgIds: number[], primaryOrgId: number | null) {
-    return request.put(`/user/${id}/organizations`, { orgIds, primaryOrgId })
+    return request.put<void>(`/user/${id}/organizations`, { orgIds, primaryOrgId })
   },
 }

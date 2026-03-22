@@ -1,23 +1,17 @@
 import { defineStore } from 'pinia'
-import type { User, Menu, App } from '@/types'
+import type { User } from '@/types'
 
-interface UserState {
+interface AuthState {
   token: string
   userInfo: User | null
-  menus: Menu[]
   permissions: string[]
-  currentApp: App | null
-  apps: App[]
 }
 
-export const useUserStore = defineStore('user', {
-  state: (): UserState => ({
+export const useAuthStore = defineStore('auth', {
+  state: (): AuthState => ({
     token: localStorage.getItem('token') || '',
     userInfo: null,
-    menus: [],
     permissions: [],
-    currentApp: null,
-    apps: [],
   }),
 
   getters: {
@@ -34,21 +28,8 @@ export const useUserStore = defineStore('user', {
       this.userInfo = userInfo
     },
 
-    setMenus(menus: Menu[]) {
-      this.menus = menus
-    },
-
     setPermissions(permissions: string[]) {
       this.permissions = permissions
-    },
-
-    setCurrentApp(app: App) {
-      this.currentApp = app
-      localStorage.setItem('currentAppId', String(app.id))
-    },
-
-    setApps(apps: App[]) {
-      this.apps = apps
     },
 
     hasPermission(permission: string): boolean {
@@ -58,12 +39,8 @@ export const useUserStore = defineStore('user', {
     logout() {
       this.token = ''
       this.userInfo = null
-      this.menus = []
       this.permissions = []
-      this.currentApp = null
-      this.apps = []
       localStorage.removeItem('token')
-      localStorage.removeItem('currentAppId')
     },
   },
 })

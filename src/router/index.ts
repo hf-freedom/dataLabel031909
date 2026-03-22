@@ -1,5 +1,7 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import Layout from '@/layouts/Index.vue'
+import { cancelAllPendingRequests } from '@/utils/request'
+import { useAuthStore } from '@/stores'
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
@@ -85,6 +87,34 @@ export const asyncRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes: [...constantRoutes, ...asyncRoutes],
+})
+
+// 全局前置守卫
+router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  // 取消所有未完成的请求
+  cancelAllPendingRequests()
+
+  const authStore = useAuthStore()
+  const token = authStore.token
+
+  // 设置页面标题
+  if (to.meta?.title) {
+    document.title = `${to.meta.title} - ${import.meta.env.VITE_APP_TITLE || '管理系统'}`
+  }
+
+  // 如果已经登录且访问登录页，跳转到首页
+  if (to.path === '/login' && token) {
+    next('/')
+    return
+  }
+
+  // 如果未登录且不是登录页，跳转到登录页
+  if (!token && to.path !== '/login') {
+    next('/login')
+    return
+  }
+
+  next()
 })
 
 export default router

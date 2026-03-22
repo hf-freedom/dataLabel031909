@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ApiTransfer: typeof import('./components/ApiTransfer.vue')['default']
+    ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
@@ -38,6 +39,7 @@ declare module 'vue' {
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
+    ElResult: typeof import('element-plus/es')['ElResult']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
@@ -49,6 +51,7 @@ declare module 'vue' {
     ElTransfer: typeof import('element-plus/es')['ElTransfer']
     ElTree: typeof import('element-plus/es')['ElTree']
     ElTreeSelect: typeof import('element-plus/es')['ElTreeSelect']
+    ErrorBoundary: typeof import('./components/ErrorBoundary.vue')['default']
     IconPicker: typeof import('./components/IconPicker.vue')['default']
     MenuTree: typeof import('./components/MenuTree.vue')['default']
     OrgTreeSelect: typeof import('./components/OrgTreeSelect.vue')['default']

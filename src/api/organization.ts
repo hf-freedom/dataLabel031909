@@ -1,15 +1,25 @@
 import { request } from '@/utils/request'
-import type { Organization } from '@/types'
+import type { Organization, OrganizationType, UserStatus, User } from '@/types'
 
 export interface OrganizationForm {
   id?: number
   name: string
   code: string
   sort: number
-  type: number
+  type: OrganizationType
   leader: string
   phone: string
-  status: number
+  status: UserStatus
+  parentId: number | null
+}
+
+export interface UpdateSortRequest {
+  id: number
+  sort: number
+}
+
+export interface MoveNodeRequest {
+  id: number
   parentId: number | null
 }
 
@@ -31,18 +41,18 @@ export const organizationApi = {
   },
 
   delete(id: number) {
-    return request.delete(`/organization/${id}`)
+    return request.delete<void>(`/organization/${id}`)
   },
 
   updateSort(id: number, sort: number) {
-    return request.put(`/organization/${id}/sort`, { sort })
+    return request.put<void>(`/organization/${id}/sort`, { id, sort } as UpdateSortRequest)
   },
 
   moveNode(id: number, parentId: number | null) {
-    return request.put(`/organization/${id}/move`, { parentId })
+    return request.put<void>(`/organization/${id}/move`, { id, parentId } as MoveNodeRequest)
   },
 
   getUsers(id: number) {
-    return request.get(`/organization/${id}/users`)
+    return request.get<User[]>(`/organization/${id}/users`)
   },
 }

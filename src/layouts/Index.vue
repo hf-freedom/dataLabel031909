@@ -1,5 +1,15 @@
 <template>
   <el-container class="layout-container">
+    <!-- 全局Loading遮罩 -->
+    <div v-if="loadingStore.globalLoading" class="global-loading-mask">
+      <div class="global-loading-content">
+        <el-icon class="is-loading" size="40">
+          <Loading />
+        </el-icon>
+        <p class="loading-text">加载中...</p>
+      </div>
+    </div>
+
     <el-aside :width="isCollapse ? '64px' : '220px'" class="layout-aside">
       <div class="logo">
         <img src="/vite.svg" alt="logo" />
@@ -42,7 +52,7 @@
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar :size="32" icon="UserFilled" />
-              <span class="username">{{ userStore.userInfo?.name || '管理员' }}</span>
+              <span class="username">{{ authStore.userInfo?.name || '管理员' }}</span>
               <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
@@ -69,14 +79,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '@/stores'
+import { Fold, Expand, ArrowDown, Loading } from '@element-plus/icons-vue'
+import { useAuthStore, useLoadingStore } from '@/stores'
 import SidebarItem from './SidebarItem.vue'
 import AppSelector from './AppSelector.vue'
 
 const title = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
+const authStore = useAuthStore()
+const loadingStore = useLoadingStore()
 
 const isCollapse = ref(false)
 
@@ -103,7 +115,7 @@ const handleCommand = (command: string) => {
       router.push('/password')
       break
     case 'logout':
-      userStore.logout()
+      authStore.logout()
       router.push('/login')
       break
   }
@@ -197,5 +209,35 @@ const handleCommand = (command: string) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.global-loading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.global-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 50px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  .loading-text {
+    margin-top: 15px;
+    color: #666;
+    font-size: 14px;
+  }
 }
 </style>
